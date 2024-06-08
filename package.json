@@ -1,0 +1,31 @@
+{
+  "name": "wato-consultation",
+  "version": "1.0.0",
+  "description": "Welcome to DataForge Consultation, your go-to for expert IT consulting in data science & cybersecurity. Our pros offer tailored solutions for navigating digital complexities with confidence. Trust us to safeguard your operations & unlock your tech's full potential. Let's secure success together.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "connect-flash": "^0.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "ejs-mate": "^4.0.0",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.4.1",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.3",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^8.0.0",
+    "validator": "^13.12.0"
+  }
+}
