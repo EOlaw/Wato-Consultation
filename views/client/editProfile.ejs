@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Client Profile</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Client Profile</h2>
+        <% if (error) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+        <% } %>
+        <form action="/profile/client" method="POST">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" class="form-control" value="<%= client.fullName %>" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" class="form-control" value="<%= client.address %>" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" value="<%= client.phoneNumber %>" required>
+            </div>
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" name="company" class="form-control" value="<%= client.company %>" required>
+            </div>
+            <div class="form-group">
+                <label for="jobTitle">Job Title</label>
+                <input type="text" id="jobTitle" name="jobTitle" class="form-control" value="<%= client.jobTitle %>" required>
+            </div>
+            <div class="form-group">
+                <label for="projects">Projects</label>
+                <input type="text" id="projects" name="projects" class="form-control" value="<%= client.projects %>" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+    </div>
+</body>
+</html>
