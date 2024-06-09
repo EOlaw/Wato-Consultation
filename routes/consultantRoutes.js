@@ -1,21 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const consultantControllers = require('../controllers/consultantControllers');
-const { isAuthenticated } = require('../controllers/authControllers');
+const { isAuthenticated, isConsultant } = require('../controllers/authControllers');
 
-// Consultant profile routes
-router.route('/create-consultant')
-    .get(isAuthenticated, consultantControllers.renderCreateProfile)
-    .post(isAuthenticated, consultantControllers.createConsultantProfile);
+// Render form to create a new consultant profile
+router.route('/new')
+    .get(isAuthenticated, isConsultant, consultantControllers.renderCreateForm);
+router.route('/')
+    .post(isAuthenticated, isConsultant, consultantControllers.createConsultant)
+    .get(isAuthenticated, isConsultant, consultantControllers.getConsultants)
 
-router.route('/consultant')
-    .get(isAuthenticated, consultantControllers.renderProfile)
-    .post(isAuthenticated, consultantControllers.updateConsultantProfile);
+// Render form to update a consultant profile by ID
+router.route('/:id/edit')
+    .get(isAuthenticated, isConsultant, consultantControllers.renderUpdateForm);
 
-router.route('/delete')
-    .post(isAuthenticated, consultantControllers.deleteConsultantProfile);
-
-router.route('/list')
-    .get(consultantControllers.getConsultants);
+router.route('/:id')
+    .get(isAuthenticated, isConsultant, consultantControllers.getConsultant)
+    .put(isAuthenticated, isConsultant, consultantControllers.updateConsultant)
+    .delete(isAuthenticated, isConsultant, consultantControllers.deleteConsultant)
 
 module.exports = router;

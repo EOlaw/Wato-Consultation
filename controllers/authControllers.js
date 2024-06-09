@@ -14,5 +14,17 @@ function isAuthenticated(req, res, next) {
     }
     next()
 }
+function isConsultant(req, res, next) {
+    if (req.user && req.user.role === 'consultant') {
+        return next();
+    }
+    res.redirect('/');
+}
+function isClient(req, res, next) {
+    if (req.user && req.user.role === 'client') {
+        return next();
+    }
+    res.redirect('/');
+}
 
-module.exports = { isAuthenticated }
+module.exports = { isAuthenticated, isConsultant, isClient }

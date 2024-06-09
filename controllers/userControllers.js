@@ -1,4 +1,6 @@
 const User = require('../models/userModel');
+const Consultant = require('../models/consultantModel')
+const Client = require('../models/clientModel')
 const passport = require('passport');
 
 const userControllers = {
@@ -42,29 +44,51 @@ const userControllers = {
     },
 
     // Login User
-    loginUser: (req, res, next) => {
-        //req.flash('success', 'welcome back!');
-        const redirectUrl = req.session.returnTo || '/';
-        delete req.session.returnTo;
-        res.redirect(redirectUrl);
+    loginUser: async (req, res, next) => {
+        try {
+            // Check the role of the user
+            const user = req.user;
+            if (user.role === 'consultant') {
+                // Find the consultant associated with this user
+                const consultant = await Consultant.findOne({ user: user._id });
+                if (consultant) {
+                    //req.flash('success', 'Welcome back, Consultant!');
+                    return res.redirect(`/consultant/${consultant._id}`);
+                }
+            } else if (user.role === 'client') {
+                // Find the client associated with this user
+                const client = await Client.findOne({ user: user._id });
+                if (client) {
+                    //req.flash('success', 'Welcome back, Client!');
+                    return res.redirect('/client');
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            req.flash('error', 'Something went wrong. Please try again.');
+            res.redirect('/user/login');
+        }
     },
 
     // Logout User
     logoutUser: (req, res) => {
         req.logout(err => {
             if (err) return next(err);
-            req.flash('success_msg', 'You are logged out');
+            //req.flash('success_msg', 'You are logged out');
             res.redirect('/user/login');
         });
     },
 
     // Render Dashboard
-    getDashboard: (req, res) => {
+    getDashboard: async (req, res) => {
+        const user = req.user;
+        const consultant = await Consultant.findOne({ user: user._id });
+        const client = await Client.findOne({ user: user._id });
         const role = req.user.role;
         if (role === 'client') {
-            res.redirect('/client/client');
+            res.redirect(`/client/${client._id}`);
         } else if (role === 'consultant') {
-            res.redirect('/consultant/consultant');
+            res.redirect(`/consultant/${consultant._id}`);
         } else {
             res.redirect('/');
         }

@@ -1,20 +1,23 @@
+// Example usage in a route
 const express = require('express');
 const router = express.Router();
 const clientControllers = require('../controllers/clientControllers');
-const { isAuthenticated } = require('../controllers/authControllers');
-// Client profile routes
-router.route('/create-client')
-    .get(isAuthenticated, clientControllers.renderCreateProfile)
-    .post(isAuthenticated, clientControllers.createClientProfile);
+const { isAuthenticated, isClient } = require('../controllers/authControllers');
 
-router.route('/client')
-    .get(isAuthenticated, clientControllers.renderProfile)
-    .post(isAuthenticated, clientControllers.updateClientProfile);
+// Route to create a client
+router.route('/new')
+    .get(isAuthenticated, isClient, clientControllers.renderCreateForm)
+router.route('/')
+    .post(isAuthenticated, isClient, clientControllers.createClient)
+    .get(isAuthenticated, isClient, clientControllers.getClients)
+    
+// Render form to update a consultant profile by ID
+router.route('/:id/edit')
+    .get(isAuthenticated, isClient, clientControllers.renderUpdateForm);
 
-router.route('/delete')
-    .post(isAuthenticated, clientControllers.deleteClientProfile);
-
-router.route('/list')
-    .get(clientControllers.getClients);
+router.route('/:id')
+    .get(isAuthenticated, isClient, clientControllers.getClient)
+    .put(isAuthenticated, isClient, clientControllers.updateClient)
+    .delete(isAuthenticated, isClient, clientControllers.deleteClient)
 
 module.exports = router;

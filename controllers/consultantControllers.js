@@ -1,81 +1,84 @@
 const Consultant = require('../models/consultantModel');
+const User = require('../models/userModel');
 
 const consultantControllers = {
-    // Render Create Consultant Profile Page
-    renderCreateProfile: (req, res) => {
-        res.status(200).render('consultant/createProfile');
+    // Render form to create a new consultant profile
+    renderCreateForm: async (req, res) => {
+        res.render('consultant/createConsultant');
     },
 
-    // Create Consultant Profile
-    createConsultantProfile: async (req, res) => {
+    // Create a new consultant profile
+    createConsultant: async (req, res) => {
         try {
-            const { fullName, specialization, experience, phoneNumber, certifications, bio, website } = req.body;
-            const consultant = new Consultant({
-                user: req.user._id,
-                fullName,
-                specialization,
-                experience,
-                phoneNumber,
-                certifications,
-                bio,
-                website
-            });
+            const user = await User.findById(req.body.user);
+            if (!user) return res.status(404).render('error', { message: 'User not found' });
+            if (user.role !== 'consultant') return res.status(403).render('error', { message: 'Only users with the role of "Consultant" can create consultant profiles' });
+            const consultant = new Consultant(req.body);
             await consultant.save();
-            //req.flash('success_msg', 'Profile created successfully');
-            res.redirect('/user/dashboard');
+            res.redirect(`/consultant/${consultant._id}`);
         } catch (err) {
-            //req.flash('error_msg', 'Error: ' + err.message);
-            res.redirect('/consultant/create-profile');
+            res.status(400).render('error', { message: err.message });
         }
     },
 
-    // Render Consultant Profile
-    renderProfile: async (req, res) => {
-        try {
-            const consultant = await Consultant.findOne({ user: req.user._id });
-            res.render('consultant/profiles', { consultant });
-        } catch (err) {
-            res.status(500).send(err);
-        }
-    },
-    // Render Consultant List
+    // Get all consultant profiles
     getConsultants: async (req, res) => {
         try {
-            const consultants = await Consultant.find();
-            res.render('consultant/list', { consultants });
+            const consultants = await Consultant.find().populate('user');
+            //res.json({ message: 'Consultant', consultants })
+            res.render('consultant/listConsultants', { consultants });
         } catch (err) {
-            res.status(500).send(err);
+            res.status(400).render('error', { message: err.message });
         }
     },
 
-    // Update Consultant Profile
-    updateConsultantProfile: async (req, res) => {
+    // Get a consultant profile by ID
+    getConsultant: async (req, res) => {
         try {
-            const { fullName, specialization, experience, phoneNumber, certifications, bio, website } = req.body;
-            await Consultant.findOneAndUpdate(
-                { user: req.user._id },
-                { fullName, specialization, experience, phoneNumber, certifications, bio, website },
-                { new: true }
-            );
-            //req.flash('success_msg', 'Profile updated successfully');
-            res.redirect('/dashboard');
+            const consultant = await Consultant.findById(req.params.id).populate('user');
+            if (!consultant) return res.status(404).json('error', { message: 'Consultant profile not found' });
+            const user = await User.findById(consultant.user);
+            res.render('consultant/consultantProfile', { consultant: { ...consultant._doc, user } });
+            //res.json({ message: 'Consultant', consultant })
+            //res.render('consultant/viewConsultant', { consultant });
         } catch (err) {
-            //req.flash('error_msg', 'Error: ' + err.message);
-            res.redirect('/dashboard');
+            res.status(400).render('error', { message: err.message });
         }
     },
 
-    // Delete Consultant Profile
-    deleteConsultantProfile: async (req, res) => {
+    // Render form to update a consultant profile by ID
+    renderUpdateForm: async (req, res) => {
         try {
-            await Consultant.findOneAndDelete({ user: req.user._id });
-            //req.flash('success_msg', 'Profile deleted successfully');
-            res.redirect('/dashboard');
+            const consultant = await Consultant.findById(req.params.id).populate('user');
+            if (!consultant) return res.status(404).render('error', { message: 'Consultant profile not found' });
+            res.render('consultant/updateConsultant', { consultant });
         } catch (err) {
-            //req.flash('error_msg', 'Error: ' + err.message);
-            res.redirect('/dashboard');
+            res.status(400).render('error', { message: err.message });
         }
     },
+
+    // Update a consultant profile by ID
+    updateConsultant: async (req, res) => {
+        try {
+            const consultant = await Consultant.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).populate('user');
+            if (!consultant) return res.status(404).render('error', { message: 'Consultant profile not found' });
+            res.redirect(`/consultant/${consultant._id}`);
+        } catch (err) {
+            res.status(400).render('error', { message: err.message });
+        }
+    },
+
+    // Delete a consultant profile by ID
+    deleteConsultant: async (req, res) => {
+        try {
+            const consultant = await Consultant.findByIdAndDelete(req.params.id);
+            if (!consultant) return res.status(404).render('error', { message: 'Consultant profile not found' });
+            res.redirect('/consultant');
+        } catch (err) {
+            res.status(400).render('error', { message: err.message });
+        }
+    }
 };
 
 module.exports = consultantControllers;
+

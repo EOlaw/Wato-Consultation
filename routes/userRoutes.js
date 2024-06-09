@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const userControllers = require('../controllers/userControllers');
+const { isAuthenticated, isClient } = require('../controllers/authControllers');
+
 
 // User routes
 router.route('/register')
@@ -13,15 +15,15 @@ router.route('/login')
     .get(userControllers.renderLogin)
 
 router.route('/logout')
-    .get(userControllers.logoutUser);
+    .get(isAuthenticated, userControllers.logoutUser);
 
 router.route('/dashboard')
     .get(userControllers.getDashboard);
 
-router.route('/list')
-    .get(userControllers.getUsers);
+router.route('/')
+    .get(isAuthenticated, userControllers.getUsers);
 
 router.route('/delete/:id')
-    .post(userControllers.deleteUser);
+    .post(isAuthenticated, userControllers.deleteUser);
 
 module.exports = router;
